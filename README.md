@@ -1,30 +1,35 @@
 # Timecoin wallet
 
-Testnet wallet behavior for Timecoin. This is not a mainnet wallet and it does not talk to a public network.
+Wallet for the Timecoin testnet. The token is Timecoin. The ticker is TIC. Consensus is the node at <https://github.com/9lordisgod/Timecoin>. This repository builds notes, checks a transfer locally, and does not seal blocks.
 
-The node and the demo client live in [Timecoin](https://github.com/Timechain-HQ/Timecoin). Protocol details are in the [book](https://github.com/Timechain-HQ/book).
+Organization copy of the node: <https://github.com/Timechain-HQ/Timecoin>
 
-## Keys
+```mermaid
+flowchart LR
+    view[ML-KEM-768 view key]
+    cap[ML-DSA-44 capability key]
+    scan[Decapsulate and check the MAC]
+    pay[Select notes, pay the recipient, keep change]
+    sweep[Spend the received note into a fresh note]
+    view --> scan --> pay --> sweep
+    cap --> pay
+```
 
-Each wallet has two local keys:
+A local ledger rejects a transfer whose inputs do not equal its outputs plus the fee, and a transfer whose one-time key does not sign the sighash. The node checks the same transfer again inside a block.
 
-- An ML-KEM-768 view key. It opens notes sent to this wallet.
-- An ML-DSA-44 capability key. It authorizes contract deployment and contract calls.
+```bash
+python3 -m unittest tests.test_wallet
+python3 -m tcwallet.cli charts
+```
 
-Spend keys are one-time. The sender generates one for each new note and encrypts it to the recipient's view key.
+The chart session funds 50 TIC, pays 20 TIC with a 500 base-unit fee, then sweeps. The local ledger removes that fee from the note set. The node pays the same fee into the coinbase. Bob's swept note does not open under Alice's view key.
 
-## Scan
+![Balances](docs/charts/balances.png)
 
-The wallet reads every unspent note. It decapsulates the ML-KEM ciphertext with the view key and checks the MAC. A note that fails the MAC is ignored. A note that opens yields the one-time spend key, the memo, and the amount.
+![Notes opened by each view key](docs/charts/opened.png)
 
-## Pay
+![Bytes in the funded note](docs/charts/note-bytes.png)
 
-The wallet selects its own notes until they cover the amount and the fee. It builds one note for the recipient and, when needed, a change note for itself. Each input is signed by its one-time key.
+![Inputs and change notes](docs/charts/selection.png)
 
-## Sweep
-
-Sweep spends a received note into a new note addressed to the same wallet. After the sweep is in a block, the sender's view key cannot open the new note. If the sender kept the original one-time key, that key is useless once the nullifier is published.
-
-## What remains visible
-
-Amounts, fees, and which note was spent are on the chain. The view key and the memo are not.
+The table is in [docs/charts/README.md](docs/charts/README.md). Protocol text is in the [book](https://github.com/Timechain-HQ/book).
