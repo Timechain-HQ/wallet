@@ -1,4 +1,16 @@
+<p align="center">
+  <img src="logo.png" alt="Timechain HQ" width="120" height="120" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/Timechain-HQ">Timechain HQ</a> ·
+  <a href="https://github.com/Timechain-HQ/roadmap">Roadmap</a> ·
+  <a href="https://www.timecoin.cash">timecoin.cash</a>
+</p>
+
 # Timecoin wallet
+
+Organization roadmap: <https://github.com/Timechain-HQ/roadmap>
 
 Wallet for the Timecoin testnet. The token is Timecoin. The ticker is TIC. Consensus is the node at <https://github.com/9lordisgod/Timecoin>. This repository builds notes, checks a transfer locally, and does not seal blocks.
 
